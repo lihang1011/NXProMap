@@ -1,0 +1,7 @@
+# Local SSH config overrides — NEVER commit these
+*.local
+
+# OS / Editor
+.DS_Store
+*.swp
+*.swo
