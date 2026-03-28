@@ -28,7 +28,7 @@
 
 `NXProMap` is a Bash helper script designed for researchers and developers who work on **remote Linux servers via SSH**. It manages SOCKS5 proxy tunnels and local port forwarding with a single command, and displays a structured, color-coded dashboard of your environment at a glance.
 
-It is the successor to [nx_proxy.sh](https://github.com/LiHang-CV/lh-proxy-helper), with a focus on robustness and automation.
+It is the successor to [nx_proxy.sh](https://github.com/lihang1011/lh-proxy-helper), with a focus on robustness and automation.
 
 ### Features
 
@@ -129,7 +129,7 @@ It is the successor to [nx_proxy.sh](https://github.com/LiHang-CV/lh-proxy-helpe
 1. **克隆仓库**
 
    ```bash
-   git clone https://github.com/LiHang-CV/NXProMap.git
+   git clone https://github.com/lihang1011/NXProMap.git
    ```
 
 2. **将脚本上传至远程服务器**（例如放在 `~/.config/`）
