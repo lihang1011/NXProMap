@@ -50,7 +50,7 @@ It is the successor to [nx_proxy.sh](https://github.com/lihang1011/lh-proxy-help
 1. **Clone the repository**
 
    ```bash
-   git clone https://github.com/LiHang-CV/NXProMap.git
+   git clone https://github.com/realihang/NXProMap.git
    ```
 
 2. **Copy the script to your remote server** (e.g., into `~/.config/` or any directory you prefer)
@@ -129,7 +129,7 @@ It is the successor to [nx_proxy.sh](https://github.com/lihang1011/lh-proxy-help
 1. **克隆仓库**
 
    ```bash
-   git clone https://github.com/lihang1011/NXProMap.git
+   git clone https://github.com/realihang/NXProMap.git
    ```
 
 2. **将脚本上传至远程服务器**（例如放在 `~/.config/`）
