@@ -6,7 +6,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Shell](https://img.shields.io/badge/Shell-Bash-green.svg)](https://www.gnu.org/software/bash/)
-[![Platform](https://img.shields.io/badge/Platform-Linux-blue.svg)](https://github.com/LiHang-CV/NXProMap)
+[![Platform](https://img.shields.io/badge/Platform-Linux-blue.svg)](https://github.com/realihang/NXProMap)
 
 </div>
 
@@ -28,49 +28,54 @@
 
 `NXProMap` is a Bash helper script designed for researchers and developers who work on **remote Linux servers via SSH**. It manages SOCKS5 proxy tunnels and local port forwarding with a single command, and displays a structured, color-coded dashboard of your environment at a glance.
 
-It is the successor to [nx_proxy.sh](https://github.com/lihang1011/lh-proxy-helper), with a focus on robustness and automation.
+It is the successor to [nx_proxy.sh](https://github.com/realihang/lh-proxy-helper), with a focus on robustness and automation.
 
 ### Features
 
-- **Multi-Port Proxy** (`nxpon`) — scans a list of candidate ports (`NX_PROXY_PORTS`) and activates the first reachable SOCKS5 tunnel
+- **First-run Wizard** (`nxinit.sh`) — interactive setup that generates `nx_info.json` with your SSH user, proxy host/port, candidate tunnel ports, and per-server SSH info
+- **Multi-Port Proxy** (`nxpon`) — scans a list of candidate ports (`NX_PROXY_PORTS`) and activates the first reachable SOCKS5 tunnel; auto-waits up to 60 s if none is found
 - **Tunnel Lifecycle** (`nxpoff` / `nxmoff`) — detects and optionally kills lingering SSH tunnel processes by PID when you turn off the proxy or port map
 - **Port Mapping** (`nxmon`) — generates the SSH `-L` command for TensorBoard / WebUI and tries to push it to your local clipboard via **OSC 52**
 - **Structured Dashboard** (`nxinfo`) — aligned table blocks for System, GPU (nvidia-smi), Proxy/Map, and Tools status
 - **Temp Proxy Exec** (`nxrun`) — run a single command under proxy, then auto-restore the environment
+- **Server Config Management** (`nxedit`) — add or remove entries in `NX_SERVER_SSH_PORTS` without editing JSON directly
 
 ### Requirements
 
 - Bash ≥ 4.0
+- `python3`
 - `curl`, `ss` (from `iproute2`)
 - `ssh` (OpenSSH)
 - *(Optional)* `nvidia-smi` for GPU info
 
 ### Installation
 
-1. **Clone the repository**
+1. **Clone the repository** on your remote server
 
    ```bash
    git clone https://github.com/realihang/NXProMap.git
    ```
 
-2. **Copy the script to your remote server** (e.g., into `~/.config/` or any directory you prefer)
+2. **Copy the scripts to a permanent location** (e.g. `~/.script/`)
 
    ```bash
-   scp NXProMap/nxpromap.sh user@your-server:~/.config/nxpromap.sh
+   mkdir -p ~/.script
+   cp NXProMap/nxpromap.sh NXProMap/nxinit.sh ~/.script/
    ```
 
-3. **Fill in your SSH credentials** — edit the top of `nxpromap.sh`:
+3. **Run the setup wizard** to generate `nx_info.json`
 
    ```bash
-   NX_SSH_USER="your_username"
-   NX_SSH_HOST="your.server.ip"
-   NX_SSH_PORT="22"
+   bash ~/.script/nxinit.sh
    ```
 
-4. **Source the script in your `~/.bashrc`** on the remote server:
+   The wizard will ask for your SSH username, local proxy address/port, candidate tunnel ports, and per-server SSH info.  
+   The resulting `nx_info.json` is placed in the same directory as `nxinit.sh` with `chmod 600`.
+
+4. **Source the script in your `~/.bashrc`** on the remote server
 
    ```bash
-   source ~/.config/nxpromap.sh
+   echo 'source ~/.script/nxpromap.sh' >> ~/.bashrc
    ```
 
 5. **Reload your shell**
@@ -83,11 +88,12 @@ It is the successor to [nx_proxy.sh](https://github.com/lihang1011/lh-proxy-help
 
 | Command | Args | Description |
 |---------|------|-------------|
-| `nxpon` | `[mode]` | Start proxy — scans ports, activates first working tunnel |
+| `nxpon` | `[mode]` | Start proxy — scans ports, waits for tunnel, activates first working one |
 | `nxpoff` | — | Stop proxy, kill tunnel processes, clean history |
 | `nxmon` | `<remote_port> [local_port]` | Set port mapping, print & copy SSH `-L` command |
 | `nxmoff` | — | Clear mapping record, kill tunnel |
 | `nxrun` | `[mode] <cmd>` | Run command under temp proxy, auto-off after |
+| `nxedit` | `[-a\|-d]` | Add (`-a`) or delete (`-d`) a server entry in `nx_info.json` |
 | `nxinfo` | — | Full-table environment dashboard |
 | `nxhelp` | — | Show command reference |
 
@@ -107,49 +113,54 @@ It is the successor to [nx_proxy.sh](https://github.com/lihang1011/lh-proxy-help
 
 `NXProMap` 是一个专为**通过 SSH 连接远程 Linux 服务器**的研究员和开发者设计的 Bash 辅助脚本。它可以一条命令管理 SOCKS5 代理隧道和本地端口转发，并以结构化、带颜色的表格展示你的完整运行环境。
 
-它是 [nx_proxy.sh](https://github.com/LiHang-CV/lh-proxy-helper) 的升级版，重点增强了健壮性与自动化程度。
+它是 [nx_proxy.sh](https://github.com/realihang/lh-proxy-helper) 的升级版，重点增强了健壮性与自动化程度。
 
 ### 功能特性
 
-- **多端口代理**（`nxpon`）— 按 `NX_PROXY_PORTS` 列表顺序扫描，自动激活第一个可用的 SOCKS5 隧道
+- **首次配置向导**（`nxinit.sh`）— 交互式向导，生成 `nx_info.json`，包含 SSH 用户名、代理地址/端口、候选隧道端口及各服务器 SSH 信息
+- **多端口代理**（`nxpon`）— 按 `NX_PROXY_PORTS` 列表顺序扫描，自动激活第一个可用隧道；若无隧道则最多等待 60 秒
 - **隧道生命周期**（`nxpoff` / `nxmoff`）— 关闭代理或映射时，自动检测并可选终止残留 SSH 隧道进程
 - **端口映射**（`nxmon`）— 生成 SSH `-L` 命令（适用于 TensorBoard/WebUI），并通过 **OSC 52** 尝试写入本地剪贴板
 - **结构化状态面板**（`nxinfo`）— 对齐表格展示系统、GPU（nvidia-smi）、代理/映射、工具状态
 - **临时代理执行**（`nxrun`）— 在代理下执行单条命令，完成后自动恢复环境
+- **服务器配置管理**（`nxedit`）— 无需手动编辑 JSON，直接增删 `NX_SERVER_SSH_PORTS` 条目
 
 ### 环境要求
 
 - Bash ≥ 4.0
+- `python3`
 - `curl`、`ss`（来自 `iproute2`）
 - `ssh`（OpenSSH）
 - *（可选）* `nvidia-smi`，用于 GPU 信息展示
 
 ### 安装步骤
 
-1. **克隆仓库**
+1. **在远程服务器上克隆仓库**
 
    ```bash
    git clone https://github.com/realihang/NXProMap.git
    ```
 
-2. **将脚本上传至远程服务器**（例如放在 `~/.config/`）
+2. **将脚本复制到固定目录**（例如 `~/.script/`）
 
    ```bash
-   scp NXProMap/nxpromap.sh user@your-server:~/.config/nxpromap.sh
+   mkdir -p ~/.script
+   cp NXProMap/nxpromap.sh NXProMap/nxinit.sh ~/.script/
    ```
 
-3. **填写你的 SSH 信息** — 编辑 `nxpromap.sh` 顶部的配置：
+3. **运行配置向导**，生成 `nx_info.json`
 
    ```bash
-   NX_SSH_USER="your_username"
-   NX_SSH_HOST="your.server.ip"
-   NX_SSH_PORT="22"
+   bash ~/.script/nxinit.sh
    ```
 
-4. **在远程服务器的 `~/.bashrc` 中 source 脚本：**
+   向导会交互式询问你的 SSH 用户名、本地代理地址/端口、候选隧道端口以及各服务器的 SSH 信息。  
+   生成的 `nx_info.json` 与脚本放在同一目录，权限自动设为 `600`。
+
+4. **在远程服务器的 `~/.bashrc` 中 source 脚本**
 
    ```bash
-   source ~/.config/nxpromap.sh
+   echo 'source ~/.script/nxpromap.sh' >> ~/.bashrc
    ```
 
 5. **重新加载 Shell**
@@ -162,11 +173,12 @@ It is the successor to [nx_proxy.sh](https://github.com/lihang1011/lh-proxy-help
 
 | 命令 | 参数 | 说明 |
 |------|------|------|
-| `nxpon` | `[mode]` | 开启代理 — 扫描端口，激活第一个可用隧道 |
+| `nxpon` | `[mode]` | 开启代理 — 扫描端口，等待并激活第一个可用隧道 |
 | `nxpoff` | — | 关闭代理，终止隧道进程，清理历史 |
 | `nxmon` | `<远端端口> [本地端口]` | 设置端口映射，输出并尝试复制 SSH `-L` 命令 |
 | `nxmoff` | — | 清除映射记录，终止隧道 |
 | `nxrun` | `[mode] <命令>` | 在代理下执行单条命令，完成后自动关闭 |
+| `nxedit` | `[-a\|-d]` | 添加（`-a`）或删除（`-d`）`nx_info.json` 中的服务器条目 |
 | `nxinfo` | — | 全表格环境状态面板 |
 | `nxhelp` | — | 显示命令参考表 |
 
@@ -181,6 +193,13 @@ It is the successor to [nx_proxy.sh](https://github.com/lihang1011/lh-proxy-help
 <a id="changelog"></a>
 
 ## Changelog
+
+### v1.1.0 — 2026-04-08
+
+- Added `nxinit.sh` — interactive first-run wizard that generates `nx_info.json` (replaces manual config editing)
+- Added `nxedit` command — add / remove `NX_SERVER_SSH_PORTS` entries without touching JSON
+- `nxpon` now auto-waits up to 60 s for a tunnel to come online when none is found
+- `nx_info.json` added to `.gitignore` to prevent accidental credential leaks
 
 ### v1.0.0 — 2026-03-27
 

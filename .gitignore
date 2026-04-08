@@ -1,6 +1,7 @@
+# Sensitive config — NEVER commit (contains IPs, ports, credentials)
+nx_info.json
 # Local SSH config overrides — NEVER commit these
 *.local
-
 # OS / Editor
 .DS_Store
 *.swp
