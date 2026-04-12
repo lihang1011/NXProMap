@@ -36,7 +36,7 @@ It is the successor to [nx_proxy.sh](https://github.com/realihang/lh-proxy-helpe
 - **Multi-Port Proxy** (`nxpon`) — scans a list of candidate ports (`NX_PROXY_PORTS`) and activates the first reachable SOCKS5 tunnel; auto-waits up to 60 s if none is found
 - **Tunnel Lifecycle** (`nxpoff` / `nxmoff`) — detects and optionally kills lingering SSH tunnel processes by PID when you turn off the proxy or port map
 - **Port Mapping** (`nxmon`) — generates the SSH `-L` command for TensorBoard / WebUI and tries to push it to your local clipboard via **OSC 52**
-- **Structured Dashboard** (`nxinfo`) — aligned table blocks for System, GPU (nvidia-smi), Proxy/Map, and Tools status
+- **Structured Dashboard** (`nxinfo`) — aligned table blocks for System, GPU (nvidia-smi), Proxy/Map, Tools, and real-time network traffic speed bars; `-w` flag enables live auto-refresh every 2 s
 - **Temp Proxy Exec** (`nxrun`) — run a single command under proxy, then auto-restore the environment
 - **Server Config Management** (`nxedit`) — add or remove entries in `NX_SERVER_SSH_PORTS` without editing JSON directly
 
@@ -94,10 +94,42 @@ It is the successor to [nx_proxy.sh](https://github.com/realihang/lh-proxy-helpe
 | `nxmoff` | — | Clear mapping record, kill tunnel |
 | `nxrun` | `[mode] <cmd>` | Run command under temp proxy, auto-off after |
 | `nxedit` | `[-a\|-d]` | Add (`-a`) or delete (`-d`) a server entry in `nx_info.json` |
-| `nxinfo` | — | Full-table environment dashboard |
+| `nxinfo` | `[-w]` | Full-table environment dashboard; `-w` for live refresh |
 | `nxhelp` | — | Show command reference |
 
-**Proxy modes:** `socks5h` (default, remote DNS) · `socks5` · `http`
+**Proxy modes:** `http` (default) · `socks5h` (remote DNS) · `socks5`
+
+### Dashboard Preview (`nxinfo -w`)
+
+```
+  System Information              Compute Environment
+  ---------------------------------------------------------
+  ❯ user@myserver                ◆ Python: 3.10.0
+    OS:    Ubuntu 20.04.6 LTS    ◆ Conda:  myenv
+    IP:    192.168.1.100         ◆ CUDA:   12.4
+    RAM:   12288/65536 MB
+    Disk:  1.2T/3.6T (Home)
+
+  GPU Status
+  ---------------------------------------------------------
+  ❯ [0] NVIDIA GeForce RTX 4090
+    Mem: 1024/24564 MB     | Util: 0%    | Temp: 42°C
+
+  Network & Proxy
+  ---------------------------------------------------------
+  ● Proxy:     IDLE   (Available :1080)
+  - Port Map:  OFF    (Not set)
+
+  Available Tools
+  ---------------------------------------------------------
+  ✔ ss      ✔ curl    ✔ ssh     ✔ git     ✗ docker  ✔ htop    ✔ vim     ✔ tmux
+
+  Network Traffic  (eth0)
+  ---------------------------------------------------------
+  ↑ Upload:    [██████████------------------------------]  27.4 KB/s
+  ↓ Download:  [█████████-------------------------------]  23.6 KB/s
+  Auto-refresh every 2s — Ctrl+C to exit
+```
 
 ### OSC 52 Clipboard Note
 
@@ -121,7 +153,7 @@ It is the successor to [nx_proxy.sh](https://github.com/realihang/lh-proxy-helpe
 - **多端口代理**（`nxpon`）— 按 `NX_PROXY_PORTS` 列表顺序扫描，自动激活第一个可用隧道；若无隧道则最多等待 60 秒
 - **隧道生命周期**（`nxpoff` / `nxmoff`）— 关闭代理或映射时，自动检测并可选终止残留 SSH 隧道进程
 - **端口映射**（`nxmon`）— 生成 SSH `-L` 命令（适用于 TensorBoard/WebUI），并通过 **OSC 52** 尝试写入本地剪贴板
-- **结构化状态面板**（`nxinfo`）— 对齐表格展示系统、GPU（nvidia-smi）、代理/映射、工具状态
+- **结构化状态面板**（`nxinfo`）— 对齐表格展示系统、GPU（nvidia-smi）、代理/映射、工具状态及实时网络流量速度条；`-w` 参数开启每 2 秒自动刷新的实时监控模式
 - **临时代理执行**（`nxrun`）— 在代理下执行单条命令，完成后自动恢复环境
 - **服务器配置管理**（`nxedit`）— 无需手动编辑 JSON，直接增删 `NX_SERVER_SSH_PORTS` 条目
 
@@ -179,10 +211,42 @@ It is the successor to [nx_proxy.sh](https://github.com/realihang/lh-proxy-helpe
 | `nxmoff` | — | 清除映射记录，终止隧道 |
 | `nxrun` | `[mode] <命令>` | 在代理下执行单条命令，完成后自动关闭 |
 | `nxedit` | `[-a\|-d]` | 添加（`-a`）或删除（`-d`）`nx_info.json` 中的服务器条目 |
-| `nxinfo` | — | 全表格环境状态面板 |
+| `nxinfo` | `[-w]` | 全表格环境状态面板；`-w` 开启实时刷新 |
 | `nxhelp` | — | 显示命令参考表 |
 
-**代理模式：** `socks5h`（默认，远端解析 DNS）· `socks5` · `http`
+**代理模式：** `http`（默认）· `socks5h`（远端解析 DNS）· `socks5`
+
+### 面板预览（`nxinfo -w`）
+
+```
+  System Information              Compute Environment
+  ---------------------------------------------------------
+  ❯ user@myserver                ◆ Python: 3.10.0
+    OS:    Ubuntu 20.04.6 LTS    ◆ Conda:  myenv
+    IP:    192.168.1.100         ◆ CUDA:   12.4
+    RAM:   12288/65536 MB
+    Disk:  1.2T/3.6T (Home)
+
+  GPU Status
+  ---------------------------------------------------------
+  ❯ [0] NVIDIA GeForce RTX 4090
+    Mem: 1024/24564 MB     | Util: 0%    | Temp: 42°C
+
+  Network & Proxy
+  ---------------------------------------------------------
+  ● Proxy:     IDLE   (Available :1080)
+  - Port Map:  OFF    (Not set)
+
+  Available Tools
+  ---------------------------------------------------------
+  ✔ ss      ✔ curl    ✔ ssh     ✔ git     ✗ docker  ✔ htop    ✔ vim     ✔ tmux
+
+  Network Traffic  (eth0)
+  ---------------------------------------------------------
+  ↑ Upload:    [██████████------------------------------]  27.4 KB/s
+  ↓ Download:  [█████████-------------------------------]  23.6 KB/s
+  Auto-refresh every 2s — Ctrl+C to exit
+```
 
 ### OSC 52 剪贴板说明
 
@@ -193,6 +257,13 @@ It is the successor to [nx_proxy.sh](https://github.com/realihang/lh-proxy-helpe
 <a id="changelog"></a>
 
 ## Changelog
+
+### v1.2.0 — 2026-04-12
+
+- `nxinfo -w / --watch`: live auto-refresh mode (every 2 s, Ctrl+C to exit, alternate screen)
+- New real-time network traffic section — upload/download speed bars via `/proc/net/dev`
+- Script UI fully switched to English (removed bilingual Chinese runtime messages)
+- Removed top-level bilingual comment header; script is now minimal and comment-free
 
 ### v1.1.0 — 2026-04-08
 
